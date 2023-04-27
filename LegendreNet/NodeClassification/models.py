@@ -15,7 +15,7 @@ from torch_geometric.utils import to_scipy_sparse_matrix
 import scipy.sparse as sp
 from scipy.special import comb
 
-from Taylorpro import Taylor_prop
+from Legendrepro import Legendre_prop
 from Bernpro import Bern_prop
 
 class GPR_prop(MessagePassing):
@@ -144,13 +144,13 @@ class BernNet(torch.nn.Module):
             x = F.dropout(x, p=self.dprate, training=self.training)
             x = self.prop1(x, edge_index)
             return F.log_softmax(x, dim=1)
-class TaylorNet(torch.nn.Module):
+class LegendreNet(torch.nn.Module):
     def __init__(self,dataset, args):
         super(TaylorNet, self).__init__()
         self.lin1 = Linear(dataset.num_features, args.hidden)
         self.lin2 = Linear(args.hidden, dataset.num_classes)
         self.m = torch.nn.BatchNorm1d(dataset.num_classes)
-        self.prop1 = Taylor_prop(args.K)
+        self.prop1 = Legendre_prop(args.K)
 
         self.dprate = args.dprate
         self.dropout = args.dropout
