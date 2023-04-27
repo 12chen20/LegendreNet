@@ -12,9 +12,9 @@ from torch_geometric.nn.conv.gcn_conv import gcn_norm
 import numpy as np
 
 
-class Taylor_prop(MessagePassing):
+class Legendre_prop(MessagePassing):
     def __init__(self, K, bias=True, **kwargs):
-        super(Taylor_prop, self).__init__(aggr='add', **kwargs)#aggr所用的聚合方法
+        super(Legendre_prop, self).__init__(aggr='add', **kwargs)#aggr所用的聚合方法
         # 当传入字典形式的参数时，就要使用 ** kwargs
         self.K = K
         # 定义新的初始化变量。模型中的参数，它是Parameter()类，
