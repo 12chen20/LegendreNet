@@ -58,11 +58,11 @@ def RunExp(args, dataset, data, Net, percls_trn, val_lb):
             [{'params': model.lin1.parameters(), 'weight_decay': args.weight_decay, 'lr': args.lr},
              {'params': model.lin2.parameters(), 'weight_decay': args.weight_decay, 'lr': args.lr},
              {'params': model.prop1.parameters(), 'weight_decay': 0.0, 'lr': args.Bern_lr}])
-    elif args.net == 'TaylorNet':
+    elif args.net == 'LegendreNet':
         optimizer = torch.optim.Adam(
             [{'params': model.lin1.parameters(), 'weight_decay': args.weight_decay, 'lr': args.lr},
              {'params': model.lin2.parameters(), 'weight_decay': args.weight_decay, 'lr': args.lr},
-             {'params': model.prop1.parameters(), 'weight_decay': 0.0, 'lr': args.Taylor_lr}])
+             {'params': model.prop1.parameters(), 'weight_decay': 0.0, 'lr': args.Legendre_lr}])
     else:
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
@@ -85,7 +85,7 @@ def RunExp(args, dataset, data, Net, percls_trn, val_lb):
             best_val_acc = val_acc
             best_val_loss = val_loss
             test_acc = tmp_test_acc
-            if args.net == 'TaylorNet':
+            if args.net == 'LegendreNet':
                 TEST = tmp_net.prop1.temp.clone()
                 theta = TEST.detach().cpu()
                 #修改
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.05, help='learning rate.')
 
     parser.add_argument('--Bern_lr', type=float, default=0.001, help='learning rate for BernNet propagation layer.')
-    parser.add_argument('--Taylor_lr', type=float, default=0.002, help='learning rate for TaylorNet propagation layer.')
+    parser.add_argument('--Taylor_lr', type=float, default=0.002, help='learning rate for LegendreNet propagation layer.')
 
     parser.add_argument('--hidden', type=int, default=64, help='hidden units.')
     parser.add_argument('--dprate', type=float, default=0.5, help='dropout for propagation layer.')
@@ -142,8 +142,8 @@ if __name__ == '__main__':
 
     parser.add_argument('--device', type=int, default=0, help='GPU device.')
     parser.add_argument('--runs', type=int, default=10, help='number of runs.')
-    parser.add_argument('--net', type=str, choices=['GCN', 'GAT', 'APPNP', 'ChebNet', 'GPRGNN', 'BernNet', 'MLP', 'TaylorNet' ],
-                        default='TaylorNet')
+    parser.add_argument('--net', type=str, choices=['GCN', 'GAT', 'APPNP', 'ChebNet', 'GPRGNN', 'BernNet', 'MLP', 'LegendreNet' ],
+                        default='LegendreNet')
 
     args = parser.parse_args()
 
@@ -167,7 +167,7 @@ if __name__ == '__main__':
         Net = GPRGNN
     elif gnn_name == 'BernNet':
         Net = BernNet
-    elif gnn_name == 'TaylorNet':
+    elif gnn_name == 'LegendreNet':
         Net = TaylorNet
 
     dataset = DataLoader(args.dataset)
@@ -187,7 +187,7 @@ if __name__ == '__main__':
         results.append([test_acc, best_val_acc, tmp_test_loss, train_loss, theta_0])
         print(
             f'run_{str(RP + 1)} \t test_acc: {test_acc:.4f} \t tmp_test_loss: {tmp_test_loss:.4f} \t train_loss: {train_loss:.4f}')
-        if args.net == 'TaylorNet':
+        if args.net == 'LegendreNet':
             print('Theta:', [float('{:.4f}'.format(i)) for i in theta_0])
 
     run_sum = 0
